@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Kmd.Logic.Authentication
+namespace Kmd.Logic.Identity.Authorization
 {
     /// <summary>
     /// Provide the configuration options for issuing an authorization token required to access Logic services.

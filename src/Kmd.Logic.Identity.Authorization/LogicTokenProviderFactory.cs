@@ -8,7 +8,7 @@ using Microsoft.Rest;
 using Microsoft.Rest.Serialization;
 using Newtonsoft.Json;
 
-namespace Kmd.Logic.Authentication
+namespace Kmd.Logic.Identity.Authorization
 {
     /// <summary>
     /// Generate authorization tokens required to access Logic services.

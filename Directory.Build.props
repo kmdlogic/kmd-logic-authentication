@@ -8,10 +8,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Description>A library for KMD Logic Authentication</Description>
-    <VersionPrefix>0.1.0</VersionPrefix>
+    <Description>A library for KMD Logic Identity Authorization</Description>
+    <VersionPrefix>1.0.0</VersionPrefix>
     <Authors>KMD</Authors>
-    <PackageTags>kmd;logic;authentication</PackageTags>
+    <PackageTags>kmd;logic;identity;authorization</PackageTags>
     <PackageIconUrl>https://console.kmdlogic.io/favicon-32x32.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/kmdlogic/kmd-logic-Authentication-client</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

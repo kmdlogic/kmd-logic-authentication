@@ -3,20 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kmd.Logic.Authentication", "src\Kmd.Logic.Authentication\Kmd.Logic.Authentication.csproj", "{0FD8BC57-7D02-4A62-BF1D-E630033F886E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kmd.Logic.Identity.Authorization", "src\Kmd.Logic.Identity.Authorization\Kmd.Logic.Identity.Authorization.csproj", "{0FD8BC57-7D02-4A62-BF1D-E630033F886E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{D0F07B26-0159-464A-8707-EE4A51903F57}"
 	ProjectSection(SolutionItems) = preProject
-		..\appveyor.yml = ..\appveyor.yml
-		..\build.ps1 = ..\build.ps1
-		..\build.sh = ..\build.sh
-		..\CHANGES.md = ..\CHANGES.md
-		..\Directory.Build.props = ..\Directory.Build.props
-		..\global.json = ..\global.json
-		..\LICENSE = ..\LICENSE
-		..\README.md = ..\README.md
-		..\setup.ps1 = ..\setup.ps1
-		..\setup.sh = ..\setup.sh
+		appveyor.yml = appveyor.yml
+		build.ps1 = build.ps1
+		build.sh = build.sh
+		CHANGES.md = CHANGES.md
+		Directory.Build.props = Directory.Build.props
+		global.json = global.json
+		LICENSE = LICENSE
+		README.md = README.md
+		setup.ps1 = setup.ps1
+		setup.sh = setup.sh
 	EndProjectSection
 EndProject
 Global

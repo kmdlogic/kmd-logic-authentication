@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Kmd.Logic.Authentication
+namespace Kmd.Logic.Identity.Authorization
 {
     [Serializable]
     public class LogicTokenProviderException : Exception

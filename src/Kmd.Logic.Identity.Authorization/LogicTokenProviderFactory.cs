@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -115,7 +116,36 @@ namespace Kmd.Logic.Identity.Authorization
 
                 if (!responseMessage.IsSuccessStatusCode)
                 {
-                    throw new LogicTokenProviderException("Unable to access the token issuer");
+                    var message = $"Unable to access the token issuer, request returned {responseMessage.StatusCode}.";
+
+                    TokenErrorResponse error = null;
+
+                    try
+                    {
+                        var errorJson = await responseMessage
+                            .Content
+                            .ReadAsStringAsync()
+                            .ConfigureAwait(false);
+
+                        error = SafeJsonConvert.DeserializeObject<TokenErrorResponse>(errorJson, this.jsonSerializerSettings);
+                    }
+#pragma warning disable CA1031 // Do not catch general exception types
+                    catch
+                    {
+                        // Do nothing
+                    }
+#pragma warning restore CA1031 // Do not catch general exception types
+
+                    if (error != null && !string.IsNullOrEmpty(error.Error))
+                    {
+                        message += $" Reason: {error.Error}.";
+                    }
+                    else if (responseMessage.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        message += " Your client credentials may be invalid or are not authorized to request the scope.";
+                    }
+
+                    throw new LogicTokenProviderException(message);
                 }
 
                 var json = await responseMessage
@@ -130,21 +160,6 @@ namespace Kmd.Logic.Identity.Authorization
         public void Dispose()
         {
             this.semaphore.Dispose();
-        }
-
-        internal class TokenResponse
-        {
-            [JsonProperty("token_type")]
-            public string TokenType { get; set; }
-
-            [JsonProperty("expires_in")]
-            public int ExpiresIn { get; set; }
-
-            [JsonProperty("ext_expires_in")]
-            public int ExtExpiresIn { get; set; }
-
-            [JsonProperty("access_token")]
-            public string AccessToken { get; set; }
         }
     }
 }

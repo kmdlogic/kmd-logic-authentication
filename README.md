@@ -46,3 +46,9 @@ var serviceClient = new LogicServiceClient(new TokenCredentials(tokenProvider))
     BaseUri = new Uri("https://gateway.kmdlogic.io/service/v1")
 };
 ```
+
+## Sample application
+
+A simple console application is included to demonstrate how to authorize an application using Logic Identity. You will need to provide the settings described above in `appsettings.json`.
+
+When run you should see the details of the issued Javascript Web Token (JWT) printed to the console.

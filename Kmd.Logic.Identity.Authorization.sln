@@ -19,6 +19,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{D0
 		setup.sh = setup.sh
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BA5CDA02-FB2B-486C-A3D4-BA7C31214278}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{F40423E8-AF80-4BA5-A807-C9479DD8EED4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kmd.Logic.Identity.Authorization.Sample", "sample\Kmd.Logic.Identity.Authorization.Sample\Kmd.Logic.Identity.Authorization.Sample.csproj", "{1C3365F0-D505-4648-842E-6D372FB37499}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,9 +35,17 @@ Global
 		{0FD8BC57-7D02-4A62-BF1D-E630033F886E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FD8BC57-7D02-4A62-BF1D-E630033F886E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0FD8BC57-7D02-4A62-BF1D-E630033F886E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C3365F0-D505-4648-842E-6D372FB37499}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C3365F0-D505-4648-842E-6D372FB37499}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C3365F0-D505-4648-842E-6D372FB37499}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C3365F0-D505-4648-842E-6D372FB37499}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0FD8BC57-7D02-4A62-BF1D-E630033F886E} = {BA5CDA02-FB2B-486C-A3D4-BA7C31214278}
+		{1C3365F0-D505-4648-842E-6D372FB37499} = {F40423E8-AF80-4BA5-A807-C9479DD8EED4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F40E6775-77F9-43FB-8773-7AAB06B978B5}

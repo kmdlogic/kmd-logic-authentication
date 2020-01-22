@@ -115,8 +115,7 @@ namespace Kmd.Logic.Identity.Authorization.Sample
                 options.AuthorizationTokenIssuer = configuration.AuthorizationTokenIssuer;
             }
 
-            var tokenFactory = new LogicTokenProviderFactory(options);
-
+            using (var tokenFactory = new LogicTokenProviderFactory(options))
             using (var httpClient = new HttpClient())
             {
                 var provider = tokenFactory.GetProvider(httpClient);

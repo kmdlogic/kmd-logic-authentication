@@ -19,6 +19,9 @@ namespace Kmd.Logic.Identity.Authorization
     /// </remarks>
     public sealed class LogicTokenProviderFactory : IDisposable
     {
+        private static readonly Uri IdentityB2CServer = new Uri("https://identity-api.kmdlogic.io/clientcredentials/token");
+        private static readonly Uri IdentityADServer = new Uri("https://login.microsoftonline.com/logicidentityprod.onmicrosoft.com/oauth2/v2.0/token");
+
         private readonly LogicTokenProviderOptions options;
         private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
         private readonly JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings();
@@ -100,60 +103,84 @@ namespace Kmd.Logic.Identity.Authorization
 
             private async Task<TokenResponse> RequestToken(HttpClient httpClient, Uri uriAuthorizationServer, string clientId, string scope, string clientSecret, CancellationToken cancellationToken)
             {
+                var server = uriAuthorizationServer;
+
+                if (server == null)
+                {
+                    if (string.IsNullOrEmpty(scope))
+                    {
+                        throw new LogicTokenProviderException("No authorization scope is defined");
+                    }
+
+                    if (scope.EndsWith("/.default", StringComparison.Ordinal))
+                    {
+                        // The default scope issued by Active Directory is ".default"
+                        // Assume the underlying provider of the client credential is AD
+                        server = IdentityADServer;
+                    }
+                    else
+                    {
+                        // Assume the underlying provider of the client credential is B2C
+                        server = IdentityB2CServer;
+                    }
+                }
+
                 HttpResponseMessage responseMessage;
 
-                var tokenRequest = new HttpRequestMessage(HttpMethod.Post, uriAuthorizationServer);
-                tokenRequest.Content = new FormUrlEncodedContent(
-                    new[]
-                    {
+                using (var tokenRequest = new HttpRequestMessage(HttpMethod.Post, server))
+                {
+                    tokenRequest.Content = new FormUrlEncodedContent(
+                        new[]
+                        {
                         new KeyValuePair<string, string>("grant_type", "client_credentials"),
                         new KeyValuePair<string, string>("client_id", clientId),
                         new KeyValuePair<string, string>("scope", scope),
                         new KeyValuePair<string, string>("client_secret", clientSecret),
-                    });
+                        });
 
-                responseMessage = await httpClient.SendAsync(tokenRequest, cancellationToken).ConfigureAwait(false);
+                    responseMessage = await httpClient.SendAsync(tokenRequest, cancellationToken).ConfigureAwait(false);
 
-                if (!responseMessage.IsSuccessStatusCode)
-                {
-                    var message = $"Unable to access the token issuer, request returned {responseMessage.StatusCode}.";
-
-                    TokenErrorResponse error = null;
-
-                    try
+                    if (!responseMessage.IsSuccessStatusCode)
                     {
-                        var errorJson = await responseMessage
-                            .Content
-                            .ReadAsStringAsync()
-                            .ConfigureAwait(false);
+                        var message = $"Unable to access the token issuer, request returned {responseMessage.StatusCode}.";
 
-                        error = SafeJsonConvert.DeserializeObject<TokenErrorResponse>(errorJson, this.jsonSerializerSettings);
-                    }
+                        TokenErrorResponse error = null;
+
+                        try
+                        {
+                            var errorJson = await responseMessage
+                                .Content
+                                .ReadAsStringAsync()
+                                .ConfigureAwait(false);
+
+                            error = SafeJsonConvert.DeserializeObject<TokenErrorResponse>(errorJson, this.jsonSerializerSettings);
+                        }
 #pragma warning disable CA1031 // Do not catch general exception types
-                    catch
-                    {
-                        // Do nothing
-                    }
+                        catch
+                        {
+                            // Do nothing
+                        }
 #pragma warning restore CA1031 // Do not catch general exception types
 
-                    if (error != null && !string.IsNullOrEmpty(error.Error))
-                    {
-                        message += $" Reason: {error.Error}.";
-                    }
-                    else if (responseMessage.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        message += " Your client credentials may be invalid or are not authorized to request the scope.";
+                        if (error != null && !string.IsNullOrEmpty(error.Error))
+                        {
+                            message += $" Reason: {error.Error}.";
+                        }
+                        else if (responseMessage.StatusCode == HttpStatusCode.Unauthorized)
+                        {
+                            message += " Your client credentials may be invalid or are not authorized to request the scope.";
+                        }
+
+                        throw new LogicTokenProviderException(message);
                     }
 
-                    throw new LogicTokenProviderException(message);
+                    var json = await responseMessage
+                        .Content
+                        .ReadAsStringAsync()
+                        .ConfigureAwait(false);
+
+                    return SafeJsonConvert.DeserializeObject<TokenResponse>(json, this.jsonSerializerSettings);
                 }
-
-                var json = await responseMessage
-                    .Content
-                    .ReadAsStringAsync()
-                    .ConfigureAwait(false);
-
-                return SafeJsonConvert.DeserializeObject<TokenResponse>(json, this.jsonSerializerSettings);
             }
         }
 

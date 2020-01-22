@@ -13,7 +13,7 @@ namespace Kmd.Logic.Identity.Authorization
         /// <remarks>
         /// This option should not be overridden except for testing purposes.
         /// </remarks>
-        public Uri AuthorizationTokenIssuer { get; set; } = new Uri("https://identity-api.kmdlogic.io/clientcredentials/token");
+        public Uri AuthorizationTokenIssuer { get; set; }
 
         /// <summary>
         /// Gets or sets the Logic Identity authorization scope.

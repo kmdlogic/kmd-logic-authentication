@@ -16,7 +16,8 @@ Perhaps the easiest way to configure the LogicTokenProviderFactory is from Appli
 {
   "TokenProvider": {
     "ClientId": "",
-    "ClientSecret": ""
+    "ClientSecret": "",
+    "AuthorizationScope": ""
   }
 }
 ```
@@ -24,7 +25,7 @@ Perhaps the easiest way to configure the LogicTokenProviderFactory is from Appli
 To get started:
 
 1. Create a subscription in [Logic Console](https://console.kmdlogic.io). This will provide you the `SubscriptionId` which will be linked to the client credentials.
-2. Request a client credential. Once issued you can view the `ClientId` and `ClientSecret` in [Logic Console](https://console.kmdlogic.io).
+2. Request a client credential. Once issued you can view the `ClientId`, `ClientSecret` and `AuthorizationScope` in [Logic Console](https://console.kmdlogic.io).
 
 ## Calling Logic services using LogicTokenProviderFactory
 

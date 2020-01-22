@@ -53,3 +53,18 @@ var serviceClient = new LogicServiceClient(new TokenCredentials(tokenProvider))
 A simple console application is included to demonstrate how to authorize an application using Logic Identity. You will need to provide the settings described above in `appsettings.json`.
 
 When run you should see the details of the issued Javascript Web Token (JWT) printed to the console.
+
+## Breaking Change in Version 1.1.0
+
+In version 1.1.0 of this library, the default value for LogicTokenProviderOptions.AuthorizationScope was removed.
+
+For dependent packages which need to maintain backward compatibility, you can set the DefaultAuthorizationScope as below.
+
+```csharp
+#pragma warning disable CS0618 // Type or member is obsolete
+    if (string.IsNullOrEmpty(this.tokenProviderFactory.DefaultAuthorizationScope))
+    {
+        this.tokenProviderFactory.DefaultAuthorizationScope = "https://logicidentityprod.onmicrosoft.com/bb159109-0ccd-4b08-8d0d-80370cedda84/.default";
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
+```

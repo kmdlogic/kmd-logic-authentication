@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -25,6 +26,12 @@ namespace Kmd.Logic.Identity.Authorization
 
         private DateTime expiration = DateTime.Now;
         private TokenResponse currentToken;
+
+        /// <summary>
+        /// Gets or sets the default authorization scope when not configured in <see cref="LogicTokenProviderOptions"/>.
+        /// </summary>
+        [Obsolete("Provided for backwards compatibility of existing packages. Instead set the AuthorizationScope in LogicTokenProviderOptions.")]
+        public string DefaultAuthorizationScope { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LogicTokenProviderFactory"/> class.
@@ -72,11 +79,19 @@ namespace Kmd.Logic.Identity.Authorization
 
                     var expire = DateTime.Now;
 
+                    var scope = this.parent.options.AuthorizationScope;
+                    if (string.IsNullOrEmpty(scope))
+                    {
+#pragma warning disable CS0618 // Type or member is obsolete
+                        scope = this.parent.DefaultAuthorizationScope;
+#pragma warning restore CS0618 // Type or member is obsolete
+                    }
+
                     var token = await this.RequestToken(
                         this.httpClient,
                         this.parent.options.AuthorizationTokenIssuer,
                         this.parent.options.ClientId,
-                        this.parent.options.AuthorizationScope,
+                        scope,
                         this.parent.options.ClientSecret,
                         cancellationToken)
                         .ConfigureAwait(false);

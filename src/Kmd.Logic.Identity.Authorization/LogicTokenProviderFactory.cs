@@ -19,9 +19,6 @@ namespace Kmd.Logic.Identity.Authorization
     /// </remarks>
     public sealed class LogicTokenProviderFactory : IDisposable
     {
-        private static readonly Uri IdentityB2CServer = new Uri("https://identity-api.kmdlogic.io/clientcredentials/token");
-        private static readonly Uri IdentityADServer = new Uri("https://login.microsoftonline.com/logicidentityprod.onmicrosoft.com/oauth2/v2.0/token");
-
         private readonly LogicTokenProviderOptions options;
         private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
         private readonly JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings();
@@ -103,39 +100,17 @@ namespace Kmd.Logic.Identity.Authorization
 
             private async Task<TokenResponse> RequestToken(HttpClient httpClient, Uri uriAuthorizationServer, string clientId, string scope, string clientSecret, CancellationToken cancellationToken)
             {
-                var server = uriAuthorizationServer;
-
-                if (server == null)
-                {
-                    if (string.IsNullOrEmpty(scope))
-                    {
-                        throw new LogicTokenProviderException("No authorization scope is defined");
-                    }
-
-                    if (scope.EndsWith("/.default", StringComparison.Ordinal))
-                    {
-                        // The default scope issued by Active Directory is ".default"
-                        // Assume the underlying provider of the client credential is AD
-                        server = IdentityADServer;
-                    }
-                    else
-                    {
-                        // Assume the underlying provider of the client credential is B2C
-                        server = IdentityB2CServer;
-                    }
-                }
-
                 HttpResponseMessage responseMessage;
 
-                using (var tokenRequest = new HttpRequestMessage(HttpMethod.Post, server))
+                using (var tokenRequest = new HttpRequestMessage(HttpMethod.Post, uriAuthorizationServer))
                 {
                     tokenRequest.Content = new FormUrlEncodedContent(
                         new[]
                         {
-                        new KeyValuePair<string, string>("grant_type", "client_credentials"),
-                        new KeyValuePair<string, string>("client_id", clientId),
-                        new KeyValuePair<string, string>("scope", scope),
-                        new KeyValuePair<string, string>("client_secret", clientSecret),
+                            new KeyValuePair<string, string>("grant_type", "client_credentials"),
+                            new KeyValuePair<string, string>("client_id", clientId),
+                            new KeyValuePair<string, string>("scope", scope),
+                            new KeyValuePair<string, string>("client_secret", clientSecret),
                         });
 
                     responseMessage = await httpClient.SendAsync(tokenRequest, cancellationToken).ConfigureAwait(false);

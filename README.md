@@ -35,8 +35,14 @@ These clients accept a `ServiceClientCredentials` from [Microsoft.Rest.ClientRun
 Assuming you have generated a client called `LogicServiceClient`, the following will use the `LogicTokenProviderFactory` to issue a bearer token for each request.
 
 ```csharp
+var options = new LogicTokenProviderOptions
+{ 
+    ClientId = "<your client id>", 
+    ClientSecret = "<your client secret>", 
+    AuthorizationScope = "<service scope>"
+};
+
 // Create the LogicTokenProviderFactory once
-var options = new LogicTokenProviderOptions { ClientId = "<your client id>", ClientSecret = "<your client secret>" };
 var tokenProviderFactory = new LogicTokenProviderFactory(options);
 
 // Create a token provider for each service client

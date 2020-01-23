@@ -10,9 +10,6 @@ namespace Kmd.Logic.Identity.Authorization
         [JsonProperty("expires_in")]
         public int ExpiresIn { get; set; }
 
-        [JsonProperty("ext_expires_in")]
-        public int ExtExpiresIn { get; set; }
-
         [JsonProperty("access_token")]
         public string AccessToken { get; set; }
     }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -24,6 +26,12 @@ namespace Kmd.Logic.Identity.Authorization
 
         private DateTime expiration = DateTime.Now;
         private TokenResponse currentToken;
+
+        /// <summary>
+        /// Gets or sets the default authorization scope when not configured in <see cref="LogicTokenProviderOptions"/>.
+        /// </summary>
+        [Obsolete("Provided for backwards compatibility of existing packages. Instead set the AuthorizationScope in LogicTokenProviderOptions.")]
+        public string DefaultAuthorizationScope { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LogicTokenProviderFactory"/> class.
@@ -71,11 +79,19 @@ namespace Kmd.Logic.Identity.Authorization
 
                     var expire = DateTime.Now;
 
+                    var scope = this.parent.options.AuthorizationScope;
+                    if (string.IsNullOrEmpty(scope))
+                    {
+#pragma warning disable CS0618 // Type or member is obsolete
+                        scope = this.parent.DefaultAuthorizationScope;
+#pragma warning restore CS0618 // Type or member is obsolete
+                    }
+
                     var token = await this.RequestToken(
                         this.httpClient,
                         this.parent.options.AuthorizationTokenIssuer,
                         this.parent.options.ClientId,
-                        this.parent.options.AuthorizationScope,
+                        scope,
                         this.parent.options.ClientSecret,
                         cancellationToken)
                         .ConfigureAwait(false);
@@ -101,50 +117,66 @@ namespace Kmd.Logic.Identity.Authorization
             {
                 HttpResponseMessage responseMessage;
 
-                var tokenRequest = new HttpRequestMessage(HttpMethod.Post, uriAuthorizationServer);
-                tokenRequest.Content = new FormUrlEncodedContent(
-                    new[]
-                    {
-                        new KeyValuePair<string, string>("grant_type", "client_credentials"),
-                        new KeyValuePair<string, string>("client_id", clientId),
-                        new KeyValuePair<string, string>("scope", scope),
-                        new KeyValuePair<string, string>("client_secret", clientSecret),
-                    });
-
-                responseMessage = await httpClient.SendAsync(tokenRequest, cancellationToken).ConfigureAwait(false);
-
-                if (!responseMessage.IsSuccessStatusCode)
+                using (var tokenRequest = new HttpRequestMessage(HttpMethod.Post, uriAuthorizationServer))
                 {
-                    throw new LogicTokenProviderException("Unable to access the token issuer");
+                    tokenRequest.Content = new FormUrlEncodedContent(
+                        new[]
+                        {
+                            new KeyValuePair<string, string>("grant_type", "client_credentials"),
+                            new KeyValuePair<string, string>("client_id", clientId),
+                            new KeyValuePair<string, string>("scope", scope),
+                            new KeyValuePair<string, string>("client_secret", clientSecret),
+                        });
+
+                    responseMessage = await httpClient.SendAsync(tokenRequest, cancellationToken).ConfigureAwait(false);
+
+                    if (!responseMessage.IsSuccessStatusCode)
+                    {
+                        var message = $"Unable to access the token issuer, request returned {responseMessage.StatusCode}.";
+
+                        TokenErrorResponse error = null;
+
+                        try
+                        {
+                            var errorJson = await responseMessage
+                                .Content
+                                .ReadAsStringAsync()
+                                .ConfigureAwait(false);
+
+                            error = SafeJsonConvert.DeserializeObject<TokenErrorResponse>(errorJson, this.jsonSerializerSettings);
+                        }
+#pragma warning disable CA1031 // Do not catch general exception types
+                        catch
+                        {
+                            // Do nothing
+                        }
+#pragma warning restore CA1031 // Do not catch general exception types
+
+                        if (error != null && !string.IsNullOrEmpty(error.Error))
+                        {
+                            message += $" Reason: {error.Error}.";
+                        }
+                        else if (responseMessage.StatusCode == HttpStatusCode.Unauthorized)
+                        {
+                            message += " Your client credentials may be invalid or are not authorized to request the scope.";
+                        }
+
+                        throw new LogicTokenProviderException(message);
+                    }
+
+                    var json = await responseMessage
+                        .Content
+                        .ReadAsStringAsync()
+                        .ConfigureAwait(false);
+
+                    return SafeJsonConvert.DeserializeObject<TokenResponse>(json, this.jsonSerializerSettings);
                 }
-
-                var json = await responseMessage
-                    .Content
-                    .ReadAsStringAsync()
-                    .ConfigureAwait(false);
-
-                return SafeJsonConvert.DeserializeObject<TokenResponse>(json, this.jsonSerializerSettings);
             }
         }
 
         public void Dispose()
         {
             this.semaphore.Dispose();
-        }
-
-        internal class TokenResponse
-        {
-            [JsonProperty("token_type")]
-            public string TokenType { get; set; }
-
-            [JsonProperty("expires_in")]
-            public int ExpiresIn { get; set; }
-
-            [JsonProperty("ext_expires_in")]
-            public int ExtExpiresIn { get; set; }
-
-            [JsonProperty("access_token")]
-            public string AccessToken { get; set; }
         }
     }
 }

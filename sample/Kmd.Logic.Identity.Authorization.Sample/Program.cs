@@ -103,6 +103,7 @@ namespace Kmd.Logic.Identity.Authorization.Sample
             {
                 ClientId = configuration.ClientId,
                 ClientSecret = configuration.ClientSecret,
+                Tenant = configuration.Tenant,
             };
 
             if (!string.IsNullOrEmpty(configuration.AuthorizationScope))

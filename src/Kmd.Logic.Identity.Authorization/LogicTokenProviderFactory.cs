@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.Rest;
 using Microsoft.Rest.Serialization;
 using Newtonsoft.Json;
@@ -93,7 +95,8 @@ namespace Kmd.Logic.Identity.Authorization
                         this.parent.options.ClientId,
                         scope,
                         this.parent.options.ClientSecret,
-                        cancellationToken)
+                        cancellationToken,
+                        this.parent.options.Tenant)
                         .ConfigureAwait(false);
 
                     this.parent.expiration = expire.AddSeconds(token.ExpiresIn - 5);
@@ -113,9 +116,25 @@ namespace Kmd.Logic.Identity.Authorization
                 }
             }
 
-            private async Task<TokenResponse> RequestToken(HttpClient httpClient, Uri uriAuthorizationServer, string clientId, string scope, string clientSecret, CancellationToken cancellationToken)
+            private async Task<TokenResponse> RequestToken(
+                HttpClient httpClient,
+                Uri uriAuthorizationServer,
+                string clientId,
+                string scope,
+                string clientSecret,
+                CancellationToken cancellationToken,
+                string Tenant = null)
             {
                 HttpResponseMessage responseMessage;
+
+                if (Tenant != null)
+                {
+                    UriBuilder uriBuilder = new UriBuilder(uriAuthorizationServer);
+                    NameValueCollection query = HttpUtility.ParseQueryString(uriBuilder.Query);
+                    query["Tenant"] = Tenant;
+                    uriBuilder.Query = query.ToString();
+                    uriAuthorizationServer = uriBuilder.Uri;
+                }
 
                 using (var tokenRequest = new HttpRequestMessage(HttpMethod.Post, uriAuthorizationServer))
                 {

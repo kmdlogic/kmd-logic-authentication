@@ -29,5 +29,10 @@ namespace Kmd.Logic.Identity.Authorization
         /// Gets or sets the client credentials secret.
         /// </summary>
         public string ClientSecret { get; set; }
+
+        /// <summary>
+        /// Gets or sets the tenant.
+        /// </summary>
+        public string Tenant { get; set; }
     }
 }

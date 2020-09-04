@@ -11,5 +11,7 @@ namespace Kmd.Logic.Identity.Authorization.Sample
         public string ClientId { get; set; }
 
         public string ClientSecret { get; set; }
+
+        public string Tenant { get; set; }
     }
 }

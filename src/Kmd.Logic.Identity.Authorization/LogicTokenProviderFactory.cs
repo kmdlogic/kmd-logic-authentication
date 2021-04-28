@@ -110,15 +110,15 @@ namespace Kmd.Logic.Identity.Authorization
                 string scope,
                 string clientSecret,
                 CancellationToken cancellationToken,
-                string Tenant = null)
+                string tenant = null)
             {
                 HttpResponseMessage responseMessage;
 
-                if (Tenant != null)
+                if (tenant != null)
                 {
                     UriBuilder uriBuilder = new UriBuilder(uriAuthorizationServer);
                     NameValueCollection query = HttpUtility.ParseQueryString(uriBuilder.Query);
-                    query["Tenant"] = Tenant;
+                    query["Tenant"] = tenant;
                     uriBuilder.Query = query.ToString();
                     uriAuthorizationServer = uriBuilder.Uri;
                 }

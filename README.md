@@ -60,6 +60,11 @@ A simple console application is included to demonstrate how to authorize an appl
 
 When run you should see the details of the issued Javascript Web Token (JWT) printed to the console.
 
+## Breaking Change in Version 2.1.0
+
+In version 2.1.0 of this library, the DefaultAuthorizationScope was removed. 
+Please set LogicTokenProviderOptions.AuthorizationScope explicitly.
+
 ## Breaking Change in Version 2.0.0
 
 In version 2.0.0 of this library, the default value for LogicTokenProviderOptions.AuthorizationScope was removed.

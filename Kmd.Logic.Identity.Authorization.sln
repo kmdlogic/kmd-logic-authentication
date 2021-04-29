@@ -7,9 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kmd.Logic.Identity.Authoriz
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{D0F07B26-0159-464A-8707-EE4A51903F57}"
 	ProjectSection(SolutionItems) = preProject
-		appveyor.yml = appveyor.yml
-		build.ps1 = build.ps1
-		build.sh = build.sh
 		CHANGES.md = CHANGES.md
 		Directory.Build.props = Directory.Build.props
 		global.json = global.json

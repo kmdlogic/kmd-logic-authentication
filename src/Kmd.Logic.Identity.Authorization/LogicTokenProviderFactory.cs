@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -20,7 +19,7 @@ namespace Kmd.Logic.Identity.Authorization
     /// <remarks>
     /// The LogicTokenProviderFactory is intended to be a long-lived class.
     /// </remarks>
-    public sealed class LogicTokenProviderFactory : IDisposable
+    public sealed class LogicTokenProviderFactory : ITokenProviderFactory
     {
         private readonly LogicTokenProviderOptions options;
         private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
@@ -28,12 +27,6 @@ namespace Kmd.Logic.Identity.Authorization
 
         private DateTime expiration = DateTime.Now;
         private TokenResponse currentToken;
-
-        /// <summary>
-        /// Gets or sets the default authorization scope when not configured in <see cref="LogicTokenProviderOptions"/>.
-        /// </summary>
-        [Obsolete("Provided for backwards compatibility of existing packages. Instead set the AuthorizationScope in LogicTokenProviderOptions.")]
-        public string DefaultAuthorizationScope { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LogicTokenProviderFactory"/> class.
@@ -82,12 +75,6 @@ namespace Kmd.Logic.Identity.Authorization
                     var expire = DateTime.Now;
 
                     var scope = this.parent.options.AuthorizationScope;
-                    if (string.IsNullOrEmpty(scope))
-                    {
-#pragma warning disable CS0618 // Type or member is obsolete
-                        scope = this.parent.DefaultAuthorizationScope;
-#pragma warning restore CS0618 // Type or member is obsolete
-                    }
 
                     var token = await this.RequestToken(
                         this.httpClient,
@@ -123,15 +110,15 @@ namespace Kmd.Logic.Identity.Authorization
                 string scope,
                 string clientSecret,
                 CancellationToken cancellationToken,
-                string Tenant = null)
+                string tenant = null)
             {
                 HttpResponseMessage responseMessage;
 
-                if (Tenant != null)
+                if (tenant != null)
                 {
                     UriBuilder uriBuilder = new UriBuilder(uriAuthorizationServer);
                     NameValueCollection query = HttpUtility.ParseQueryString(uriBuilder.Query);
-                    query["Tenant"] = Tenant;
+                    query["Tenant"] = tenant;
                     uriBuilder.Query = query.ToString();
                     uriAuthorizationServer = uriBuilder.Uri;
                 }

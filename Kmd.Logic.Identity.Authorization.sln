@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{D0
 	ProjectSection(SolutionItems) = preProject
 		CHANGES.md = CHANGES.md
 		Directory.Build.props = Directory.Build.props
+		.github\workflows\github-cd.yml = .github\workflows\github-cd.yml
 		global.json = global.json
 		LICENSE = LICENSE
 		README.md = README.md
@@ -20,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BA5CDA02-FB2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{F40423E8-AF80-4BA5-A807-C9479DD8EED4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kmd.Logic.Identity.Authorization.Sample", "sample\Kmd.Logic.Identity.Authorization.Sample\Kmd.Logic.Identity.Authorization.Sample.csproj", "{1C3365F0-D505-4648-842E-6D372FB37499}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kmd.Logic.Identity.Authorization.Sample", "sample\Kmd.Logic.Identity.Authorization.Sample\Kmd.Logic.Identity.Authorization.Sample.csproj", "{1C3365F0-D505-4648-842E-6D372FB37499}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
